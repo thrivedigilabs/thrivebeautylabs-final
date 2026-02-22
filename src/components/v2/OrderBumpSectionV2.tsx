@@ -7,7 +7,7 @@ import { fetchProducts, ShopifyProduct } from "@/lib/shopify";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-// ✅ order bump images (from your assets)
+// ✅ order bump images
 import jewelleryBoxImg from "@/assets/jewellerybox.png";
 import travelBagImg from "@/assets/travel makeup bag.png";
 
@@ -30,7 +30,26 @@ const OrderBumpSectionV2 = () => {
   const basePrice = 799;
   const total = basePrice + (makeupBag ? 299 : 0) + (jewelleryBox ? 199 : 0);
 
+  const openCheckout = (url: string) => {
+    // Mobile/in-app browsers often block window.open after async work.
+    const isMobile =
+      /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+      ((navigator as any).maxTouchPoints && (navigator as any).maxTouchPoints > 1);
+
+    if (isMobile) {
+      // ✅ most reliable on mobile
+      window.location.assign(url);
+      return;
+    }
+
+    // ✅ desktop: try new tab, fallback to same tab if blocked
+    const opened = window.open(url, "_blank", "noopener,noreferrer");
+    if (!opened) window.location.assign(url);
+  };
+
   const handleCheckout = async () => {
+    if (isCheckingOut) return;
+
     setIsCheckingOut(true);
     try {
       clearCart();
@@ -41,12 +60,14 @@ const OrderBumpSectionV2 = () => {
 
       if (!guideProduct) {
         toast.error("Products not loaded yet. Please try again.");
-        setIsCheckingOut(false);
         return;
       }
 
       const guideVariant = guideProduct.node.variants.edges[0]?.node;
-      if (!guideVariant) return;
+      if (!guideVariant) {
+        toast.error("Product variant not found. Please try again.");
+        return;
+      }
 
       await addItem({
         product: guideProduct,
@@ -86,15 +107,18 @@ const OrderBumpSectionV2 = () => {
       }
 
       const checkoutUrl = useCartStore.getState().getCheckoutUrl();
-      if (checkoutUrl) {
-        window.open(checkoutUrl, "_blank");
-      } else {
+      if (!checkoutUrl) {
         toast.error("Failed to create checkout. Please try again.");
+        return;
       }
+
+      openCheckout(checkoutUrl);
     } catch (error) {
       console.error("Checkout error:", error);
       toast.error("Something went wrong. Please try again.");
     } finally {
+      // If we redirected successfully, this won't matter (page unloads).
+      // If popup was blocked / error occurred, UI resets.
       setIsCheckingOut(false);
     }
   };
@@ -116,9 +140,7 @@ const OrderBumpSectionV2 = () => {
               <span className="block whitespace-nowrap">Expert Guide System</span>
             </h2>
 
-            <p className="eyebrow text-center mt-2 mb-4">
-              Made for Indian Skin Tones
-            </p>
+            <p className="eyebrow text-center mt-2 mb-4">Made for Indian Skin Tones</p>
 
             {/* ✅ tighter feature list */}
             <ul className="space-y-2.5 text-left">
@@ -194,7 +216,7 @@ const OrderBumpSectionV2 = () => {
               </label>
             </div>
 
-            {/* ✅ slimmer, premium CTA (not “fat”) */}
+            {/* ✅ slimmer, premium CTA */}
             <button
               onClick={handleCheckout}
               disabled={isCheckingOut}
@@ -221,11 +243,9 @@ const OrderBumpSectionV2 = () => {
               <span className="flex items-center gap-1.5">📥 Instant Download</span>
             </div>
 
-            {/* ✅ less wasted space (kept, but compact) */}
+            {/* ✅ compact reassurance copy */}
             <div className="mt-6 text-center">
-              <p className="font-body text-muted-foreground italic text-sm mb-2">
-                Still thinking about it?
-              </p>
+              <p className="font-body text-muted-foreground italic text-sm mb-2">Still thinking about it?</p>
               <p className="font-body text-muted-foreground text-sm leading-relaxed">
                 Every day without these guides is another day of buying the wrong foundation shade,
                 wasting hours packing, and missing out on looking your absolute best.
