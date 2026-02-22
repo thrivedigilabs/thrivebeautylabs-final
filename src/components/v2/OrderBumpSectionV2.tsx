@@ -6,12 +6,16 @@ import { useCartStore } from "@/stores/cartStore";
 import { fetchProducts, ShopifyProduct } from "@/lib/shopify";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import heroImage from "@/assets/hero-guides-mockup.jpg";
+
+// ✅ order bump images (from your assets)
+import jewelleryBoxImg from "@/assets/jewellerybox.png";
+import travelBagImg from "@/assets/travel makeup bag.png";
 
 const OrderBumpSectionV2 = () => {
   const [makeupBag, setMakeupBag] = useState(false);
   const [jewelleryBox, setJewelleryBox] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+
   const addItem = useCartStore((s) => s.addItem);
   const clearCart = useCartStore((s) => s.clearCart);
 
@@ -96,27 +100,28 @@ const OrderBumpSectionV2 = () => {
   };
 
   return (
-    <section id="final-cta" className="section-padding bg-background">
-      <div className="section-container max-w-3xl">
-        <div className="border-3 border-gold rounded-3xl bg-white p-12 shadow-2xl">
+    <section id="final-cta" className="bg-background py-6">
+      {/* ✅ very less side padding + mobile-first width */}
+      <div className="mx-auto w-full max-w-md px-3">
+        <div className="border-2 border-gold/70 rounded-3xl bg-white shadow-xl">
           <motion.div
-            className="text-center"
-            initial={{ opacity: 0, y: 30 }}
+            className="px-4 py-5 sm:px-6 sm:py-6"
+            initial={{ opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <img
-              src={heroImage}
-              alt="The complete ThriveBeautyLabs guide system"
-              className="rounded-3xl shadow-2xl mb-12 w-full max-w-2xl mx-auto"
-            />
-
-            <h2 className="font-heading text-section-mobile md:text-section mb-2">
-              The ThriveBeautyLabs Expert Guide System
+            {/* ✅ HEADLINE forced 2 lines, end-to-end */}
+            <h2 className="font-heading text-[30px] leading-[1.05] tracking-tight text-center">
+              <span className="block whitespace-nowrap">The ThriveBeautyLabs</span>
+              <span className="block whitespace-nowrap">Expert Guide System</span>
             </h2>
-            <p className="eyebrow mb-8">Made for Indian Skin Tones</p>
 
-            <ul className="space-y-3 text-left max-w-md mx-auto mb-8">
+            <p className="eyebrow text-center mt-2 mb-4">
+              Made for Indian Skin Tones
+            </p>
+
+            {/* ✅ tighter feature list */}
+            <ul className="space-y-2.5 text-left">
               {[
                 "True Tone Guide (70+ pages of shade mastery)",
                 "Jetsetter Beauty Guide (50+ pages of travel expertise)",
@@ -124,88 +129,104 @@ const OrderBumpSectionV2 = () => {
                 "Lifetime Access + Free Updates Forever",
                 "30-Day Money-Back Guarantee",
               ].map((f) => (
-                <li key={f} className="flex items-center gap-3 font-body">
-                  <Check size={18} className="text-success flex-shrink-0" />
-                  {f}
+                <li key={f} className="flex items-start gap-3 font-body text-[15px] leading-snug">
+                  <Check size={18} className="text-success flex-shrink-0 mt-0.5" />
+                  <span>{f}</span>
                 </li>
               ))}
             </ul>
 
-            {/* Price */}
-            <div className="mb-8">
-              <p className="font-heading text-2xl text-muted-foreground line-through mb-1">₹2,999</p>
-              <p className="font-heading text-5xl md:text-7xl font-bold text-gradient-gold mb-2">₹{total}</p>
-              <div className="inline-block bg-destructive/10 text-destructive font-label font-semibold text-sm px-4 py-1.5 rounded-full -rotate-2">
+            {/* ✅ compact price block */}
+            <div className="mt-5 text-center">
+              <p className="font-heading text-lg text-muted-foreground line-through">₹2,999</p>
+              <p className="font-heading text-5xl font-bold text-gradient-gold leading-none mt-1">
+                ₹{total}
+              </p>
+              <div className="inline-block mt-2 bg-destructive/10 text-destructive font-label font-semibold text-xs px-3 py-1.5 rounded-full">
                 YOU SAVE: ₹{2999 - total} (73% OFF)
               </div>
             </div>
 
-            {/* Order Bumps */}
-            <div className="max-w-md mx-auto mb-8 space-y-3">
-              <p className="font-label text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+            {/* ✅ compact order bumps + images */}
+            <div className="mt-5 space-y-2.5">
+              <p className="font-label text-xs font-semibold uppercase tracking-wider text-muted-foreground text-center">
                 Add to your order
               </p>
 
               <label
-                className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                className={`flex items-center gap-3 p-3 rounded-2xl border cursor-pointer transition-all ${
                   jewelleryBox ? "border-gold bg-gold/5" : "border-border bg-card"
                 }`}
               >
-                <Checkbox
-                  checked={jewelleryBox}
-                  onCheckedChange={(v) => setJewelleryBox(!!v)}
+                <Checkbox checked={jewelleryBox} onCheckedChange={(v) => setJewelleryBox(!!v)} />
+                <img
+                  src={jewelleryBoxImg}
+                  alt="Jewellery box"
+                  className="h-12 w-12 rounded-xl object-cover border border-border/60"
                 />
                 <div className="text-left flex-1">
-                  <p className="font-body font-semibold">Jewellery Box</p>
-                  <p className="font-body text-sm text-muted-foreground">Premium travel jewellery organizer</p>
+                  <p className="font-body font-semibold leading-tight">Jewellery Box</p>
+                  <p className="font-body text-xs text-muted-foreground leading-snug">
+                    Premium travel jewellery organizer
+                  </p>
                 </div>
-                <span className="font-label font-bold text-gold-dark">+ ₹199</span>
+                <span className="font-label font-bold text-gold-dark text-sm">+ ₹199</span>
               </label>
 
               <label
-                className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                className={`flex items-center gap-3 p-3 rounded-2xl border cursor-pointer transition-all ${
                   makeupBag ? "border-gold bg-gold/5" : "border-border bg-card"
                 }`}
               >
-                <Checkbox
-                  checked={makeupBag}
-                  onCheckedChange={(v) => setMakeupBag(!!v)}
+                <Checkbox checked={makeupBag} onCheckedChange={(v) => setMakeupBag(!!v)} />
+                <img
+                  src={travelBagImg}
+                  alt="Makeup travel bag"
+                  className="h-12 w-12 rounded-xl object-cover border border-border/60"
                 />
                 <div className="text-left flex-1">
-                  <p className="font-body font-semibold">Makeup Travel Bag</p>
-                  <p className="font-body text-sm text-muted-foreground">Spacious beauty essentials pouch</p>
+                  <p className="font-body font-semibold leading-tight">Makeup Travel Bag</p>
+                  <p className="font-body text-xs text-muted-foreground leading-snug">
+                    Spacious beauty essentials pouch
+                  </p>
                 </div>
-                <span className="font-label font-bold text-gold-dark">+ ₹299</span>
+                <span className="font-label font-bold text-gold-dark text-sm">+ ₹299</span>
               </label>
             </div>
 
-            {/* CTA */}
+            {/* ✅ slimmer, premium CTA (not “fat”) */}
             <button
               onClick={handleCheckout}
               disabled={isCheckingOut}
-              className="btn-primary text-xl !px-12 !py-6 pulse-cta inline-flex items-center gap-2 disabled:opacity-70"
+              className="mt-5 w-full rounded-full border border-gold/60 bg-gradient-to-b from-gold to-gold-dark text-white font-label tracking-wide
+                         py-4 px-6 text-base inline-flex items-center justify-center gap-2
+                         shadow-lg disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {isCheckingOut ? (
                 <>
-                  <Loader2 size={22} className="animate-spin" />
+                  <Loader2 size={18} className="animate-spin" />
                   Processing...
                 </>
               ) : (
                 <>
-                  GET INSTANT ACCESS NOW — ₹{total}
-                  <ArrowRight size={22} />
+                  GET INSTANT ACCESS — ₹{total}
+                  <ArrowRight size={18} />
                 </>
               )}
             </button>
 
-            <div className="flex flex-wrap justify-center gap-6 mt-8 text-sm font-label text-muted-foreground">
+            {/* ✅ tighter trust row */}
+            <div className="mt-4 flex justify-center gap-5 text-xs font-label text-muted-foreground">
               <span className="flex items-center gap-1.5">🔒 Secure Checkout</span>
               <span className="flex items-center gap-1.5">📥 Instant Download</span>
             </div>
 
-            <div className="mt-16 max-w-xl mx-auto">
-              <p className="font-body text-muted-foreground italic mb-4">Still thinking about it?</p>
-              <p className="font-body text-muted-foreground leading-relaxed">
+            {/* ✅ less wasted space (kept, but compact) */}
+            <div className="mt-6 text-center">
+              <p className="font-body text-muted-foreground italic text-sm mb-2">
+                Still thinking about it?
+              </p>
+              <p className="font-body text-muted-foreground text-sm leading-relaxed">
                 Every day without these guides is another day of buying the wrong foundation shade,
                 wasting hours packing, and missing out on looking your absolute best.
               </p>
